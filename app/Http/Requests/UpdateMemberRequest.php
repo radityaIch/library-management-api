@@ -13,7 +13,7 @@ class UpdateMemberRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,11 @@ class UpdateMemberRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'required|max:50',
+            'email' => 'required|email|unique:members',
+            'password' => 'required|min:8',
+            'phone' => 'required|numeric',
+            'address' => 'required'
         ];
     }
 }

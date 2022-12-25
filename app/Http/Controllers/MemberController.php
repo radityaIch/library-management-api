@@ -15,7 +15,8 @@ class MemberController extends Controller
      */
     public function index()
     {
-        //
+        $members = Member::latest()->get();
+        return response()->json($members, 200);
     }
 
     /**
@@ -26,40 +27,91 @@ class MemberController extends Controller
      */
     public function store(StoreMemberRequest $request)
     {
-        //
+        try {
+            $member = new Member();
+            $member->name = $request->name;
+            $member->email = $request->email;
+            $member->password = $request->password;
+            $member->phone = $request->phone;
+            $member->address = $request->address;
+
+            $member->save();
+
+            return response()->json(
+                ['success' => 'added member'],
+                200
+            );
+        } catch (\Throwable $th) {
+            return response()->json(
+                ['error' => 'failed to add member'],
+                400
+            );
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Member  $member
      * @return \Illuminate\Http\Response
      */
-    public function show(Member $member)
+    public function show($id)
     {
-        //
+        try {
+            $member = Member::find($id)->get();
+            return response()->json($member, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'data not found'
+            ], 404);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdateMemberRequest  $request
-     * @param  \App\Models\Member  $member
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateMemberRequest $request, Member $member)
+    public function update(UpdateMemberRequest $request, $id)
     {
-        //
+        try {
+            $member = Member::find($id)->get();
+            $member->name = $request->name;
+            $member->email = $request->email;
+            $member->password = $request->password;
+            $member->phone = $request->phone;
+            $member->address = $request->address;
+
+            $member->save();
+
+            return response()->json(
+                ['success' => 'added member'],
+                200
+            );
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'can\'t update member'
+            ], 400);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Member  $member
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Member $member)
+    public function destroy($id)
     {
-        //
+        try {
+            $member = Member::find($id);
+            $member->delete();
+            return response()->json([
+                'success' => 'delete data'
+            ], 204);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'data not found'
+            ], 404);
+        }
     }
 }
