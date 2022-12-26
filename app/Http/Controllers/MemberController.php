@@ -15,8 +15,16 @@ class MemberController extends Controller
      */
     public function index()
     {
-        $members = Member::latest()->get();
-        return response()->json($members, 200);
+        try {
+            $members = Member::latest()->get();
+
+            return response()->json($members, 200);
+        } catch (\Throwable $th) {
+            return response()->json(
+                ['error' => $th],
+                400
+            );
+        }
     }
 
     /**
@@ -39,11 +47,11 @@ class MemberController extends Controller
 
             return response()->json(
                 ['success' => 'added member'],
-                200
+                201
             );
         } catch (\Throwable $th) {
             return response()->json(
-                ['error' => 'failed to add member'],
+                ['error' => 'failed to add member : ' . $th],
                 400
             );
         }
@@ -61,7 +69,7 @@ class MemberController extends Controller
             return response()->json($member, 200);
         } catch (\Throwable $th) {
             return response()->json([
-                'error' => 'data not found'
+                'error' => 'data not found : ' . $th
             ], 404);
         }
     }
@@ -90,7 +98,7 @@ class MemberController extends Controller
             );
         } catch (\Throwable $th) {
             return response()->json([
-                'error' => 'can\'t update member'
+                'error' => 'can\'t update member : ' . $th
             ], 400);
         }
     }
@@ -110,7 +118,7 @@ class MemberController extends Controller
             ], 204);
         } catch (\Throwable $th) {
             return response()->json([
-                'error' => 'data not found'
+                'error' => 'data not found : ' . $th
             ], 404);
         }
     }
