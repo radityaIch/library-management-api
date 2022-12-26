@@ -15,9 +15,16 @@ class BookCategoryController extends Controller
      */
     public function index()
     {
-        $bookCategories = BookCategory::all()->latest()->get();
+        try {
+            $bookCategories = BookCategory::all()->latest()->get();
 
-        return response()->json($bookCategories, 200);
+            return response()->json($bookCategories, 200);
+        } catch (\Throwable $th) {
+            return response()->json(
+                ['error' => $th],
+                400
+            );
+        }
     }
 
     /**
@@ -28,11 +35,18 @@ class BookCategoryController extends Controller
      */
     public function store(StoreBookCategoryRequest $request)
     {
-        $bookCategory = new BookCategory();
-        $bookCategory->category_name = $request->category_name;
-        $bookCategory->save();
+        try {
+            $bookCategory = new BookCategory();
+            $bookCategory->category_name = $request->category_name;
+            $bookCategory->save();
 
-        return response()->json(['success' => 'added category'], 201);
+            return response()->json(['success' => 'added category'], 201);
+        } catch (\Throwable $th) {
+            return response()->json(
+                ['error' => $th],
+                400
+            );
+        }
     }
 
     /**
@@ -42,9 +56,15 @@ class BookCategoryController extends Controller
      */
     public function show($id)
     {
-        $bookCategory = BookCategory::find($id)->get();
-
-        return response()->json($bookCategory, 200);
+        try {
+            $bookCategory = BookCategory::find($id)->get();
+            return response()->json($bookCategory, 200);
+        } catch (\Throwable $th) {
+            return response()->json(
+                ['error' => $th],
+                404
+            );
+        }
     }
 
     /**
@@ -55,11 +75,18 @@ class BookCategoryController extends Controller
      */
     public function update(UpdateBookCategoryRequest $request, $id)
     {
-        $bookCategory = BookCategory::find($id);
-        $bookCategory->category_name = $request->category_name;
-        $bookCategory->save();
+        try {
+            $bookCategory = BookCategory::find($id);
+            $bookCategory->category_name = $request->category_name;
+            $bookCategory->save();
 
-        return response()->json(['success' => 'updated category'], 200);
+            return response()->json(['success' => 'updated category'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(
+                ['error' => $th],
+                400
+            );
+        }
     }
 
     /**
@@ -69,9 +96,16 @@ class BookCategoryController extends Controller
      */
     public function destroy(BookCategory $id)
     {
-        $bookCategory = BookCategory::find($id);
-        $bookCategory->delete();
+        try {
+            $bookCategory = BookCategory::find($id);
+            $bookCategory->delete();
 
-        return response()->json(['success' => 'deleted category'], 200);
+            return response()->json(['success' => 'deleted category'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(
+                ['error' => $th],
+                404
+            );
+        }
     }
 }
