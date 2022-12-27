@@ -16,4 +16,8 @@ class Member extends Model
         'phone',
         'address'
     ];
+
+    public function lends(){
+        return $this->hasMany(Lend::class);
+    }
 }
