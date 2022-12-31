@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+
+use App\Http\Requests\BookRequest;
 
 class BookController extends Controller
 {
@@ -16,7 +19,7 @@ class BookController extends Controller
     public function index()
     {
         try {
-            $books = Book::all()->latest()->get();
+            $books = Book::latest()->get();
 
             return response()->json($books, 200);
         } catch (\Throwable $th) {
@@ -36,6 +39,14 @@ class BookController extends Controller
     public function store(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), BookRequest::rules());
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors()->all()
+                ], 400);
+            }
+
             $book = new Book();
             $book->id_kategori = $request->id_kategori;
             $book->judul = $request->judul;
@@ -68,7 +79,7 @@ class BookController extends Controller
     public function show($id)
     {
         try {
-            $book = Book::find($id)->get();
+            $book = Book::find($id);
             return response()->json($book, 200);
         } catch (\Throwable $th) {
             return response()->json(
@@ -95,9 +106,11 @@ class BookController extends Controller
 
             $image = $request->file('cover_image');
 
-            Storage::delete('public/images/books/cover/' . $book->cover_image);
+            if (Storage::exists('public/images/books/cover/' . $book->cover_image)) {
+                Storage::delete('public/images/books/cover/' . $book->cover_image);
+            }
 
-            $book->cover_image = uniqid() . '-' . $image->getFilename() . '.' . $image->getClientOriginalExtension();
+            $book->cover_image = uniqid() . '-' . $image->getClientOriginalName();
             $image->storeAs('public/images/books/cover', $book->cover_image);
 
             $book->qty = $request->qty;
@@ -107,8 +120,8 @@ class BookController extends Controller
             return response()->json(['success' => 'updated book'], 201);
         } catch (\Throwable $th) {
             return response()->json(
-                ['error' => $th],
-                400
+                ['error' => $th->getMessage()],
+                500
             );
         }
     }

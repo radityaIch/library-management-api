@@ -21,7 +21,7 @@ class UpdateMemberRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public static function rules()
     {
         return [
             'name' => 'required|max:50',

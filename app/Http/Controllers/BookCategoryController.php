@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\BookCategory;
-use App\Http\Requests\StoreBookCategoryRequest;
-use App\Http\Requests\UpdateBookCategoryRequest;
+use App\Http\Requests\BookCategoryRequest;
+use Illuminate\Support\Facades\Validator;
 
 class BookCategoryController extends Controller
 {
@@ -16,7 +16,7 @@ class BookCategoryController extends Controller
     public function index()
     {
         try {
-            $bookCategories = BookCategory::all()->latest()->get();
+            $bookCategories = BookCategory::latest()->get();
 
             return response()->json($bookCategories, 200);
         } catch (\Throwable $th) {
@@ -30,14 +30,21 @@ class BookCategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreBookCategoryRequest  $request
+     * @param  \App\Http\Requests\BookCategoryRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreBookCategoryRequest $request)
+    public function store(BookCategoryRequest $request)
     {
         try {
+            $validator = Validator::make($request->all(), BookCategoryRequest::rules());
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors()->all()
+                ], 400);
+            }
+
             $bookCategory = new BookCategory();
-            $bookCategory->category_name = $request->category_name;
+            $bookCategory->category = $request->category_name;
             $bookCategory->save();
 
             return response()->json(['success' => 'added category'], 201);
@@ -57,12 +64,19 @@ class BookCategoryController extends Controller
     public function show($id)
     {
         try {
-            $bookCategory = BookCategory::find($id)->get();
-            return response()->json($bookCategory, 200);
+            $bookCategory = BookCategory::find($id);
+            if (!$bookCategory) {
+                return response()->json(
+                    ['error' => 'data not found'],
+                    404
+                );
+            } else {
+                return response()->json($bookCategory, 200);
+            }
         } catch (\Throwable $th) {
             return response()->json(
                 ['error' => $th],
-                404
+                400
             );
         }
     }
@@ -70,14 +84,21 @@ class BookCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateBookCategoryRequest  $request
+     * @param  \App\Http\Requests\BookCategoryRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateBookCategoryRequest $request, $id)
+    public function update(BookCategoryRequest $request, $id)
     {
         try {
+            $validator = Validator::make($request->all(), BookCategoryRequest::rules());
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors()->all()
+                ], 400);
+            }
+
             $bookCategory = BookCategory::find($id);
-            $bookCategory->category_name = $request->category_name;
+            $bookCategory->category = $request->category_name;
             $bookCategory->save();
 
             return response()->json(['success' => 'updated category'], 200);
@@ -94,7 +115,7 @@ class BookCategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy(BookCategory $id)
+    public function destroy($id)
     {
         try {
             $bookCategory = BookCategory::find($id);

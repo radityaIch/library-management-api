@@ -36,6 +36,13 @@ class MemberController extends Controller
     public function store(StoreMemberRequest $request)
     {
         try {
+            $validator = Validator::make($request->all(), StoreMemberRequest::rules());
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors()->all()
+                ], 400);
+            }
+
             $member = new Member();
             $member->name = $request->name;
             $member->email = $request->email;
@@ -65,7 +72,7 @@ class MemberController extends Controller
     public function show($id)
     {
         try {
-            $member = Member::find($id)->get();
+            $member = Member::find($id);
             return response()->json($member, 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -83,7 +90,14 @@ class MemberController extends Controller
     public function update(UpdateMemberRequest $request, $id)
     {
         try {
-            $member = Member::find($id)->get();
+            $validator = Validator::make($request->all(), StoreMemberRequest::rules());
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors()->all()
+                ], 400);
+            }
+
+            $member = Member::find($id);
             $member->name = $request->name;
             $member->email = $request->email;
             $member->password = $request->password;
@@ -121,5 +135,59 @@ class MemberController extends Controller
                 'error' => 'data not found : ' . $th
             ], 404);
         }
+    }
+
+
+    public function login()
+    {
+        $credentials = request(['email', 'password']);
+
+        $member = Member::where('email', $credentials['email'])->first();
+
+        if (!$member) {
+            return response()->json(['message' => 'Invalid email or password'], 401);
+        }
+
+        if ($member->email_verified_at == null) {
+            return response()->json(['message' => 'Email not verified'], 401);
+        }
+
+        if ($member->verified == null) {
+            return response()->json(['message' => 'Not verified by admin'], 401);
+        }
+
+        if (!$token = auth()->attempt($credentials)) {
+            return response()->json(['message' => 'Invalid email or password'], 401);
+        }
+
+        return $this->respondWithToken($token);
+    }
+
+    public function member()
+    {
+        return response()->json([
+            'data' => auth()->user()
+        ], 200);
+    }
+
+    public function logout()
+    {
+        auth()->logout();
+
+        return response()->json(['message' => 'member logged out successfully']);
+    }
+
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 720
+        ]);
     }
 }

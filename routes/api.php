@@ -37,10 +37,23 @@ Route::group([
     Route::post('admin/user/register', [UserController::class, 'register'])->middleware('admin');
 });
 
+
+// book api
 Route::group([
     'middleware' => 'api',
-    'prefix' => 'book'
+    'prefix' => 'books'
 ], function(){
     Route::get('/', [BookController::class, 'index']);
-    Route::post('/create', [BookController::class, 'store'])->middleware('admin');
+    Route::get('/book/{id}', [BookController::class, 'show']);
+    Route::post('/book/', [BookController::class, 'store'])->middleware('admin');
+    // Route::post('/book/{id}', [BookController::class, 'update'])->middleware('admin');
+    Route::patch('/book/{id}', [BookController::class, 'update'])->middleware('admin')->middleware('put.form');
+    Route::delete('/book/{id}', [BookController::class, 'destroy'])->middleware('admin');
+
+    // categories
+    Route::get('/categories/', [BookCategoryController::class, 'index']);
+    Route::get('/category/{id}', [BookCategoryController::class, 'show'])->middleware('admin');
+    Route::post('/category/', [BookCategoryController::class, 'store'])->middleware('admin');
+    Route::patch('/category/{id}', [BookCategoryController::class, 'update'])->middleware('admin');
+    Route::delete('/category/{id}', [BookCategoryController::class, 'destroy'])->middleware('admin');
 });

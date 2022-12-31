@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateBookCategoryRequest extends FormRequest
+class BookRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,10 +21,15 @@ class UpdateBookCategoryRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public static function rules()
     {
         return [
-            'category_name' => 'required|max:50'
+            'id_kategori' => 'required|numeric',
+            'judul' => 'required',
+            'deskripsi' => 'required',
+            'author' => 'required',
+            'cover_image' => 'required|image|mimes:png,jpg',
+            'qty' => 'required|numeric'
         ];
     }
 }
