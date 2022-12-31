@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class IsAdmin
+class IsMember
 {
     /**
      * Handle an incoming request.
@@ -14,15 +14,16 @@ class IsAdmin
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next, $guard = 'apimembers')
     {
-        $user = auth()->user();
-        // var_dump($user);
-        if (!$user && !isset($user->position)) {
+        $member = auth()->guard($guard)->user();
+        if (!$member) {
             return response()->json([
                 'message' => 'Unauthorized'
             ], 401);
         }
+        $request->id = $member->id;
+
         return $next($request);
     }
 }

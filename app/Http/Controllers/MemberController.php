@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use App\Http\Requests\StoreMemberRequest;
 use App\Http\Requests\UpdateMemberRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class MemberController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
@@ -29,11 +32,10 @@ class MemberController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreMemberRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(StoreMemberRequest $request)
+    public function store(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), StoreMemberRequest::rules());
@@ -46,7 +48,7 @@ class MemberController extends Controller
             $member = new Member();
             $member->name = $request->name;
             $member->email = $request->email;
-            $member->password = $request->password;
+            $member->password = Hash::make($request->password);
             $member->phone = $request->phone;
             $member->address = $request->address;
 
@@ -67,7 +69,7 @@ class MemberController extends Controller
     /**
      * Display the specified resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
@@ -84,13 +86,13 @@ class MemberController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateMemberRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateMemberRequest $request, $id)
+    public function update(Request $request, $id)
     {
         try {
-            $validator = Validator::make($request->all(), StoreMemberRequest::rules());
+            $validator = Validator::make($request->all(), UpdateMemberRequest::rules());
             if ($validator->fails()) {
                 return response()->json([
                     'error' => $validator->errors()->all()
@@ -100,7 +102,7 @@ class MemberController extends Controller
             $member = Member::find($id);
             $member->name = $request->name;
             $member->email = $request->email;
-            $member->password = $request->password;
+            $member->password = Hash::make($request->password);
             $member->phone = $request->phone;
             $member->address = $request->address;
 
@@ -120,7 +122,7 @@ class MemberController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy($id)
     {
@@ -145,18 +147,11 @@ class MemberController extends Controller
         $member = Member::where('email', $credentials['email'])->first();
 
         if (!$member) {
-            return response()->json(['message' => 'Invalid email or password'], 401);
+            return response()->json(['message' => 'Invalid email or password2'], 401);
         }
 
-        if ($member->email_verified_at == null) {
-            return response()->json(['message' => 'Email not verified'], 401);
-        }
-
-        if ($member->verified == null) {
-            return response()->json(['message' => 'Not verified by admin'], 401);
-        }
-
-        if (!$token = auth()->attempt($credentials)) {
+        if (!$token = auth()->guard('apimembers')->attempt($credentials)) {
+            // var_dump($token);
             return response()->json(['message' => 'Invalid email or password'], 401);
         }
 
