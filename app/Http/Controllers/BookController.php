@@ -19,7 +19,7 @@ class BookController extends Controller
     public function index()
     {
         try {
-            $books = Book::latest()->get();
+            $books = Book::with('bookCategory')->latest()->get();
 
             return response()->json($books, 200);
         } catch (\Throwable $th) {
@@ -54,7 +54,7 @@ class BookController extends Controller
             $book->author = $request->author;
 
             $image = $request->file('cover_image');
-            $book->cover_image = uniqid() . '-' . $image->getFilename() . '.' . $image->getClientOriginalExtension();
+            $book->cover_image = uniqid() . '-' . $image->getClientOriginalName();
 
             $book->qty = $request->qty;
 
@@ -104,14 +104,17 @@ class BookController extends Controller
             $book->deskripsi = $request->deskripsi;
             $book->author = $request->author;
 
-            $image = $request->file('cover_image');
+            if ($request->file('cover_image')) {
+                var_dump($request->file('cover_image'));
+                $image = $request->file('cover_image');
 
-            if (Storage::exists('public/images/books/cover/' . $book->cover_image)) {
-                Storage::delete('public/images/books/cover/' . $book->cover_image);
+                if (Storage::exists('public/images/books/cover/' . $book->cover_image)) {
+                    Storage::delete('public/images/books/cover/' . $book->cover_image);
+                }
+                $book->cover_image = uniqid() . '-' . $image->getClientOriginalName();
+                $image->storeAs('public/images/books/cover', $book->cover_image);
+
             }
-
-            $book->cover_image = uniqid() . '-' . $image->getClientOriginalName();
-            $image->storeAs('public/images/books/cover', $book->cover_image);
 
             $book->qty = $request->qty;
 

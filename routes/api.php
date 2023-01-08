@@ -21,6 +21,7 @@ use App\Models\BookCategory;
 |
 */
 
+// member
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth',
@@ -28,12 +29,13 @@ Route::group([
     // member
     Route::post('/login', [MemberController::class, 'login']);
     Route::post('/register', [MemberController::class, 'store']);
+    Route::get('/logged_in', [MemberController::class, 'member'])->middleware('member');
     // Route::get('/user/profile', [MemberController::class, 'show'])->middleware('member');
     // Route::patch('/user/update', [MemberController::class, 'update'])->middleware('member');
     // Route::delete('/user/delete', [MemberController::class, 'destroy'])->middleware('member');
 });
 
-
+// admin
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
@@ -50,9 +52,9 @@ Route::group([
     // admin
     Route::post('/admin/login', [UserController::class, 'login']);
     Route::get('/admin/logout', [UserController::class, 'logout'])->middleware('admin');
+    Route::get('/admin/logged_in', [UserController::class, 'user'])->middleware('admin');
     Route::get('/admin/users', [UserController::class, 'index'])->middleware('admin');
     Route::post('/admin/refresh', [UserController::class, 'refresh']);
-    Route::get('/admin/user', [UserController::class, 'user'])->middleware('admin');
     Route::get('/admin/user/{id}', [UserController::class, 'show'])->middleware('admin');
     Route::get('/admin/user/verify/{id}', [UserController::class, 'verified'])->middleware('admin');
     Route::post('/admin/user/update', [UserController::class, 'update'])->middleware('admin');
@@ -76,7 +78,7 @@ Route::group([
 
     // categories
     Route::get('/categories/', [BookCategoryController::class, 'index']);
-    Route::get('/category/{id}', [BookCategoryController::class, 'show'])->middleware('admin');
+    Route::get('/category/{id}', [BookCategoryController::class, 'show']);
     Route::post('/category/', [BookCategoryController::class, 'store'])->middleware('admin');
     Route::patch('/category/{id}', [BookCategoryController::class, 'update'])->middleware('admin');
     Route::delete('/category/{id}', [BookCategoryController::class, 'destroy'])->middleware('admin');
@@ -87,7 +89,7 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'lends'
 ], function () {
-    Route::get('/', [LendController::class, 'index'])->middleware('member');
+    Route::get('/', [LendController::class, 'index']);
     Route::get('/mylends', [LendController::class, 'showByMember'])->middleware('member');
     Route::post('/mylends', [LendController::class, 'store'])->middleware('member');
 

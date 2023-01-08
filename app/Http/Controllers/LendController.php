@@ -15,7 +15,7 @@ class LendController extends Controller
     public function index()
     {
         try {
-            $lends = Lend::latest()->get();
+            $lends = Lend::With('books')->with('members')->latest()->get();
 
             return response()->json($lends, 200);
         } catch (\Throwable $th) {
@@ -60,6 +60,11 @@ class LendController extends Controller
     public function storeAdmin(Request $request)
     {
         try {
+            $check = Lend::where('id_buku', $request->id_buku)->get();
+            if ($check) {
+                return response()->json(['Error' => 'Can\'t lend the same book'], 401);
+            }
+
             $lend = new Lend();
             $lend->id_buku = $request->id_buku;
             $lend->id_anggota = $request->id_anggota;

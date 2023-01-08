@@ -18,11 +18,13 @@ class Lend extends Model
         'status_peminjaman'
     ];
 
-    public function books(){
-        return $this->belongsTo(Book::class);
+    public function books()
+    {
+        return $this->belongsTo(Book::class, 'id_buku');
     }
 
-    public function members(){
-        return $this->belongsTo(Member::class);
+    public function members()
+    {
+        return $this->belongsTo(Member::class, 'id_anggota');
     }
 }

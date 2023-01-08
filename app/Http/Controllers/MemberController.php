@@ -161,7 +161,7 @@ class MemberController extends Controller
     public function member()
     {
         return response()->json([
-            'data' => auth()->user()
+            'data' => auth()->guard('apimembers')->user()
         ], 200);
     }
 

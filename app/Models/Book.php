@@ -19,7 +19,7 @@ class Book extends Model
     ];
 
     public function bookCategory(){
-        return $this->belongsTo(BookCategory::class);
+        return $this->belongsTo(BookCategory::class, 'id_kategori');
     }
 
     public function lends(){
