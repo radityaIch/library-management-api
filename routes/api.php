@@ -94,7 +94,7 @@ Route::group([
     Route::post('/mylends', [LendController::class, 'store'])->middleware('member');
 
     Route::post('/lend/add', [LendController::class, 'storeAdmin'])->middleware('admin');
-    Route::get('/lend/{id}', [LendController::class, 'show'])->middleware('admin');
-    Route::patch('/lend/{id}', [LendController::class, 'update'])->middleware('admin');
+    Route::get('/lend/{id}', [LendController::class, 'show']);
+    Route::post('/lend/{id}', [LendController::class, 'update'])->middleware('admin');
     Route::delete('/lend/{id}', [LendController::class, 'destroy'])->middleware('admin');
 });

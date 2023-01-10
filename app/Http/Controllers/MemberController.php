@@ -48,7 +48,7 @@ class MemberController extends Controller
             $member = new Member();
             $member->name = $request->name;
             $member->email = $request->email;
-            $member->password = Hash::make($request->password);
+            $member->password = Hash::make("password1234");
             $member->phone = $request->phone;
             $member->address = $request->address;
 
@@ -102,7 +102,7 @@ class MemberController extends Controller
             $member = Member::find($id);
             $member->name = $request->name;
             $member->email = $request->email;
-            $member->password = Hash::make($request->password);
+            // $member->password = Hash::make("Password");
             $member->phone = $request->phone;
             $member->address = $request->address;
 
