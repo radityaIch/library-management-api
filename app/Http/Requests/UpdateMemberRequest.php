@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateMemberRequest extends FormRequest
 {
@@ -21,11 +22,14 @@ class UpdateMemberRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public static function rules()
+    public static function rules($id)
     {
         return [
             'name' => 'required|max:50',
-            'email' => 'required|email|unique:members',
+            'email' => [
+                'required',
+                Rule::unique("members")->ignore($id),
+            ],
             'phone' => 'required|numeric',
             'address' => 'required'
         ];

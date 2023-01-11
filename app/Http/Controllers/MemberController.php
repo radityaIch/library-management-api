@@ -92,14 +92,13 @@ class MemberController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $validator = Validator::make($request->all(), UpdateMemberRequest::rules());
+            $member = Member::find($id);
+            $validator = Validator::make($request->all(), UpdateMemberRequest::rules($member->id));
             if ($validator->fails()) {
                 return response()->json([
                     'error' => $validator->errors()->all()
                 ], 400);
             }
-
-            $member = Member::find($id);
             $member->name = $request->name;
             $member->email = $request->email;
             // $member->password = Hash::make("Password");
@@ -109,8 +108,8 @@ class MemberController extends Controller
             $member->save();
 
             return response()->json(
-                ['success' => 'added member'],
-                200
+                ['success' => 'update member'],
+                201
             );
         } catch (\Throwable $th) {
             return response()->json([

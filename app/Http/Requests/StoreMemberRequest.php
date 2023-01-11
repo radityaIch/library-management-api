@@ -26,7 +26,6 @@ class StoreMemberRequest extends FormRequest
         return [
             'name' => 'required|max:50',
             'email' => 'required|email|unique:members',
-            'password' => 'required|min:8',
             'phone' => 'required|numeric',
             'address' => 'required'
         ];

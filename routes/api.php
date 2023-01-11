@@ -45,7 +45,7 @@ Route::group([
     Route::get('/users', [MemberController::class, 'index'])->middleware('admin');
     Route::post('/user', [MemberController::class, 'store'])->middleware('admin');
     Route::get('/user/{id}', [MemberController::class, 'show'])->middleware('admin');
-    Route::patch('/user/{id}', [MemberController::class, 'update'])->middleware('admin');
+    Route::patch('/user/{id}', [MemberController::class, 'update'])->middleware('admin')->middleware('put.form');
     Route::delete('/user/{id}', [MemberController::class, 'destroy'])->middleware('admin');
 
 
